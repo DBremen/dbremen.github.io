@@ -5,6 +5,41 @@
     <meta name="viewport" content="width=1200, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Embed observable notebook into blog</title>
+    <style>
+      /* https://css-tricks.com/full-width-containers-limited-width-parents/ */
+      .fullwidth {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+      }
+    </style>
   </head>
-  <body></body>
+  <body>
+    <p id="viewof-p"></p>
+    <div class="fullwidth"><div id="display"></div></div>
+
+    <!-- https://api.observablehq.com/@dirkbremen/lunch-calculator.js -->
+    <script type="module">
+      import notebook from "https://api.observablehq.com/@fil/tissots-indicatrix.js?key=1ef8c91929d29461";
+
+      const renders = {
+        "viewof p": "#viewof-p",
+        display: "#display"
+      };
+
+      import {
+        Inspector,
+        Runtime
+      } from "https://unpkg.com/@observablehq/notebook-runtime@1.2.0?module";
+      for (let i in renders) renders[i] = document.querySelector(renders[i]);
+
+      Runtime.load(notebook, variable => {
+        if (renders[variable.name])
+          return new Inspector(renders[variable.name]);
+      });
+    </script>
+  </body>
 </html>
