@@ -18,16 +18,20 @@
     </style>
   </head>
   <body>
-    <p id="viewof-p"></p>
-    <div class="fullwidth"><div id="display"></div></div>
+    <h1>
+      <a href="https://api.observablehq.com/@dirkbremen/lunch-calculator.js"
+        >How-To Embed an Observable Notebook in Jeykyll</a
+      >
+    </h1>
+    <p id="viewof-sandwiches"></p>
+    <div><div id="total"></div></div>
 
-    <!-- https://api.observablehq.com/@dirkbremen/lunch-calculator.js -->
     <script type="module">
-      import notebook from "https://api.observablehq.com/@fil/tissots-indicatrix.js?key=1ef8c91929d29461";
+      import notebook from "https://api.observablehq.com/@dirkbremen/lunch-calculator.js";
 
       const renders = {
-        "viewof p": "#viewof-p",
-        display: "#display"
+        "viewof sandwiches": "#viewof-sandwiches",
+        total: "#total"
       };
 
       import {
