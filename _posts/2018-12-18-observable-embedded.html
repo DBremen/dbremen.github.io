@@ -21,16 +21,16 @@
     <a href="https://visionscarto.net/observable-jekyll/"
       >How-To Embed an Observable Notebook in your CMS</a
     >
-    <p id="sandwiches"></p>
-    <div><div id="total"></div></div>
+    <p id="viewof-p"></p>
+    <div class="fullwidth"><div id="display"></div></div>
 
-    <!---->
+    <!-- https://api.observablehq.com/@dirkbremen/lunch-calculator.js -->
     <script type="module">
-      import notebook from "https://api.observablehq.com/@dirkbremen/lunch-calculator.js";
+      import notebook from "https://api.observablehq.com/@fil/tissots-indicatrix.js?key=1ef8c91929d29461";
 
       const renders = {
-        sandwiches: "#sandwiches",
-        display: "#total"
+        "viewof p": "#viewof-p",
+        display: "#display"
       };
 
       import {
