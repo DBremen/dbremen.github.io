@@ -101,19 +101,16 @@ defaults:
 
 # Site Author
 author:
-  name: Michael Rose
-  picture: /images/michael-rose-photo.jpg
+  name: Dirk Bremen
+  picture: /images/powershellone.png
   email:
-  twitter: mmistakes
+  twitter: powershellone
   links:
     - title: Twitter
-      url: https://twitter.com/mmistakes
+      url: https://twitter.com/powershellone
       icon: fab fa-twitter-square
-    - title: Instagram
-      url: https://instagram.com/mmistakes
-      icon: fab fa-instagram
     - title: GitHub
-      url: https://github.com/mmistakes
+      url: https://github.com/dbremen
       icon: fab fa-github-square
 
 # Footer Links
