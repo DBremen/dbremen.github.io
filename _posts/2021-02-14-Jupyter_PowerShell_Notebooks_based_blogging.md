@@ -2,7 +2,7 @@
 
 
 
-![image.png](attachment:ec5c798f-c021-4644-9b22-a47730569748.png)
+![image.png](/images/Jupyter_PowerShell_Notebooks_based_blogging_files/att_00000.png)
 
 
 In this post I would like to share how one can use PowerShell Jupyter Notebooks with .Net interactive (The .Net interactive Notebook feature has also been recently introduced by the PowerShell team (see [here](https://devblogs.microsoft.com/powershell/public-preview-of-powershell-support-in-jupyter-notebooks/))) as a blogging platform for Wordpress.com or Markdown based static site generators like [Jeykll](https://jekyllrb.com/).  In fact the blog post you are currently reading is entirely based on such a notebook. You can open the notebook and interactively run the PowerShell code using this [link](https://mybinder.org/v2/gh/DBremen/JupyterPowerShell/main?urlpath=lab/tree/Jupyter_PowerShell_Notebooks_based_blogging.ipynb) or start with a new PowerShell notebook from this [link](https://mybinder.org/v2/gh/dotnet/interactive/main?urlpath=lab). While this blog post/notebook will not contain much PowerShell code I'm planning to use this for all my blog posts going forward.
@@ -12,11 +12,227 @@ If you are not familiar with Jupyter notebooks I would encourage you to go throu
 
 As an example. Here is just some fun PowerShell code example borrowed from Jeff Hicks [blog](https://jdhitsolutions.com/blog/powershell/7278/friday-fun-powershell-ascii-art/) that was executed within the Notebook:
 
-```python
+```PowerShell
 $text = [System.Uri]::EscapeDataString('Hello World!')
 $url = "https://artii.herokuapp.com/make?text=$text&font=big"
 Invoke-RestMethod $url -DisableKeepAlive
 ```
+
+
+
+
+<div>
+
+    <div id='dotnet-interactive-this-cell-172.Microsoft.DotNet.Interactive.Http.HttpPort' style='display: none'>
+
+        The below script needs to be able to find the current output cell; this is an easy method to get it.
+
+    </div>
+
+    <script type='text/javascript'>
+
+async function probeAddresses(probingAddresses) {
+
+    function timeout(ms, promise) {
+
+        return new Promise(function (resolve, reject) {
+
+            setTimeout(function () {
+
+                reject(new Error('timeout'))
+
+            }, ms)
+
+            promise.then(resolve, reject)
+
+        })
+
+    }
+
+
+
+    if (Array.isArray(probingAddresses)) {
+
+        for (let i = 0; i < probingAddresses.length; i++) {
+
+
+
+            let rootUrl = probingAddresses[i];
+
+
+
+            if (!rootUrl.endsWith('/')) {
+
+                rootUrl = `${rootUrl}/`;
+
+            }
+
+
+
+            try {
+
+                let response = await timeout(1000, fetch(`${rootUrl}discovery`, {
+
+                    method: 'POST',
+
+                    cache: 'no-cache',
+
+                    mode: 'cors',
+
+                    timeout: 1000,
+
+                    headers: {
+
+                        'Content-Type': 'text/plain'
+
+                    },
+
+                    body: probingAddresses[i]
+
+                }));
+
+
+
+                if (response.status == 200) {
+
+                    return rootUrl;
+
+                }
+
+            }
+
+            catch (e) { }
+
+        }
+
+    }
+
+}
+
+
+
+function loadDotnetInteractiveApi() {
+
+    probeAddresses(["http://10.2.1.196:1025/", "http://127.0.0.1:1025/"])
+
+        .then((root) => {
+
+        // use probing to find host url and api resources
+
+        // load interactive helpers and language services
+
+        let dotnetInteractiveRequire = require.config({
+
+        context: '172.Microsoft.DotNet.Interactive.Http.HttpPort',
+
+                paths:
+
+            {
+
+                'dotnet-interactive': `${root}resources`
+
+                }
+
+        }) || require;
+
+
+
+            window.dotnetInteractiveRequire = dotnetInteractiveRequire;
+
+
+
+            window.configureRequireFromExtension = function(extensionName, extensionCacheBuster) {
+
+                let paths = {};
+
+                paths[extensionName] = `${root}extensions/${extensionName}/resources/`;
+
+                
+
+                let internalRequire = require.config({
+
+                    context: extensionCacheBuster,
+
+                    paths: paths,
+
+                    urlArgs: `cacheBuster=${extensionCacheBuster}`
+
+                    }) || require;
+
+
+
+                return internalRequire
+
+            };
+
+        
+
+            dotnetInteractiveRequire([
+
+                    'dotnet-interactive/dotnet-interactive'
+
+                ],
+
+                function (dotnet) {
+
+                    dotnet.init(window);
+
+                },
+
+                function (error) {
+
+                    console.log(error);
+
+                }
+
+            );
+
+        })
+
+        .catch(error => {console.log(error);});
+
+    }
+
+
+
+// ensure `require` is available globally
+
+if ((typeof(require) !==  typeof(Function)) || (typeof(require.config) !== typeof(Function))) {
+
+    let require_script = document.createElement('script');
+
+    require_script.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js');
+
+    require_script.setAttribute('type', 'text/javascript');
+
+    
+
+    
+
+    require_script.onload = function() {
+
+        loadDotnetInteractiveApi();
+
+    };
+
+
+
+    document.getElementsByTagName('head')[0].appendChild(require_script);
+
+}
+
+else {
+
+    loadDotnetInteractiveApi();
+
+}
+
+
+
+    </script>
+
+</div>
+
 
       _    _      _ _        __          __        _     _ _ 
      | |  | |    | | |       \ \        / /       | |   | | |
@@ -76,7 +292,7 @@ It's actually quite easy once you have setup your environment with all pre-requi
 
 With all the prerequisites in place your folder structure should look like this (In addition to the files from the .Net interactive repo I have also added the nb2wp.py script and style.css sheet into the root of the folder the "html" folder is where the converted HTML output will be put):
 
-![image.png](attachment:4f8bb8fd-2fad-452c-9db4-a9be740ee995.png)
+![image.png](/images/Jupyter_PowerShell_Notebooks_based_blogging_files/att_00001.png)
 
 I have created another Python script (I'm quite a noob when it comes to Python, please let me know if you know of an easier way to do this) to run the nb2wp.py based on command-line arguments which I take and parse through a PowerShell script (I could have probably written the whole process in PowerShell but didn't feel like re-inventing the wheel). In addition to that the PowerShell script will remove some unwanted Input and Output indications from the Jupyter Notebook, that the Python script didn't take care of. Here are the contents of the Python script (run_nb2wp.py) ...
 ```python
