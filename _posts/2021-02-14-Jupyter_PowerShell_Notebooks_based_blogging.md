@@ -19,218 +19,112 @@ Invoke-RestMethod $url -DisableKeepAlive
 ```
 
 
-
-
-<div>
-
-    <div id='dotnet-interactive-this-cell-172.Microsoft.DotNet.Interactive.Http.HttpPort' style='display: none'>
-
-        The below script needs to be able to find the current output cell; this is an easy method to get it.
-
-    </div>
-
-    <script type='text/javascript'>
-
-async function probeAddresses(probingAddresses) {
-
-    function timeout(ms, promise) {
-
-        return new Promise(function (resolve, reject) {
-
-            setTimeout(function () {
-
-                reject(new Error('timeout'))
-
-            }, ms)
-
-            promise.then(resolve, reject)
-
-        })
-
-    }
-
-
-
-    if (Array.isArray(probingAddresses)) {
-
-        for (let i = 0; i < probingAddresses.length; i++) {
-
-
-
-            let rootUrl = probingAddresses[i];
-
-
-
-            if (!rootUrl.endsWith('/')) {
-
-                rootUrl = `${rootUrl}/`;
-
-            }
-
-
-
-            try {
-
-                let response = await timeout(1000, fetch(`${rootUrl}discovery`, {
-
-                    method: 'POST',
-
-                    cache: 'no-cache',
-
-                    mode: 'cors',
-
-                    timeout: 1000,
-
-                    headers: {
-
-                        'Content-Type': 'text/plain'
-
-                    },
-
-                    body: probingAddresses[i]
-
-                }));
-
-
-
-                if (response.status == 200) {
-
-                    return rootUrl;
-
-                }
-
-            }
-
-            catch (e) { }
-
-        }
-
-    }
-
-}
-
-
-
-function loadDotnetInteractiveApi() {
-
-    probeAddresses(["http://10.2.1.196:1025/", "http://127.0.0.1:1025/"])
-
-        .then((root) => {
-
-        // use probing to find host url and api resources
-
-        // load interactive helpers and language services
-
-        let dotnetInteractiveRequire = require.config({
-
-        context: '172.Microsoft.DotNet.Interactive.Http.HttpPort',
-
-                paths:
-
-            {
-
-                'dotnet-interactive': `${root}resources`
-
-                }
-
-        }) || require;
-
-
-
-            window.dotnetInteractiveRequire = dotnetInteractiveRequire;
-
-
-
-            window.configureRequireFromExtension = function(extensionName, extensionCacheBuster) {
-
-                let paths = {};
-
-                paths[extensionName] = `${root}extensions/${extensionName}/resources/`;
-
-                
-
-                let internalRequire = require.config({
-
-                    context: extensionCacheBuster,
-
-                    paths: paths,
-
-                    urlArgs: `cacheBuster=${extensionCacheBuster}`
-
-                    }) || require;
-
-
-
-                return internalRequire
-
-            };
-
-        
-
-            dotnetInteractiveRequire([
-
-                    'dotnet-interactive/dotnet-interactive'
-
-                ],
-
-                function (dotnet) {
-
-                    dotnet.init(window);
-
-                },
-
-                function (error) {
-
-                    console.log(error);
-
-                }
-
-            );
-
-        })
-
-        .catch(error => {console.log(error);});
-
-    }
-
-
-
-// ensure `require` is available globally
-
-if ((typeof(require) !==  typeof(Function)) || (typeof(require.config) !== typeof(Function))) {
-
-    let require_script = document.createElement('script');
-
-    require_script.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js');
-
-    require_script.setAttribute('type', 'text/javascript');
-
-    
-
-    
-
-    require_script.onload = function() {
-
-        loadDotnetInteractiveApi();
-
-    };
-
-
-
-    document.getElementsByTagName('head')[0].appendChild(require_script);
-
-}
-
-else {
-
-    loadDotnetInteractiveApi();
-
-}
-
-
-
-    </script>
-
+
+<div>
+    <div id='dotnet-interactive-this-cell-172.Microsoft.DotNet.Interactive.Http.HttpPort' style='display: none'>
+        The below script needs to be able to find the current output cell; this is an easy method to get it.
+    </div>
+    <script type='text/javascript'>
+async function probeAddresses(probingAddresses) {
+    function timeout(ms, promise) {
+        return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+                reject(new Error('timeout'))
+            }, ms)
+            promise.then(resolve, reject)
+        })
+    }
+
+    if (Array.isArray(probingAddresses)) {
+        for (let i = 0; i < probingAddresses.length; i++) {
+
+            let rootUrl = probingAddresses[i];
+
+            if (!rootUrl.endsWith('/')) {
+                rootUrl = `${rootUrl}/`;
+            }
+
+            try {
+                let response = await timeout(1000, fetch(`${rootUrl}discovery`, {
+                    method: 'POST',
+                    cache: 'no-cache',
+                    mode: 'cors',
+                    timeout: 1000,
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: probingAddresses[i]
+                }));
+
+                if (response.status == 200) {
+                    return rootUrl;
+                }
+            }
+            catch (e) { }
+        }
+    }
+}
+
+function loadDotnetInteractiveApi() {
+    probeAddresses(["http://10.2.1.196:1025/", "http://127.0.0.1:1025/"])
+        .then((root) => {
+        // use probing to find host url and api resources
+        // load interactive helpers and language services
+        let dotnetInteractiveRequire = require.config({
+        context: '172.Microsoft.DotNet.Interactive.Http.HttpPort',
+                paths:
+            {
+                'dotnet-interactive': `${root}resources`
+                }
+        }) || require;
+
+            window.dotnetInteractiveRequire = dotnetInteractiveRequire;
+
+            window.configureRequireFromExtension = function(extensionName, extensionCacheBuster) {
+                let paths = {};
+                paths[extensionName] = `${root}extensions/${extensionName}/resources/`;
+                
+                let internalRequire = require.config({
+                    context: extensionCacheBuster,
+                    paths: paths,
+                    urlArgs: `cacheBuster=${extensionCacheBuster}`
+                    }) || require;
+
+                return internalRequire
+            };
+        
+            dotnetInteractiveRequire([
+                    'dotnet-interactive/dotnet-interactive'
+                ],
+                function (dotnet) {
+                    dotnet.init(window);
+                },
+                function (error) {
+                    console.log(error);
+                }
+            );
+        })
+        .catch(error => {console.log(error);});
+    }
+
+// ensure `require` is available globally
+if ((typeof(require) !==  typeof(Function)) || (typeof(require.config) !== typeof(Function))) {
+    let require_script = document.createElement('script');
+    require_script.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js');
+    require_script.setAttribute('type', 'text/javascript');
+    
+    
+    require_script.onload = function() {
+        loadDotnetInteractiveApi();
+    };
+
+    document.getElementsByTagName('head')[0].appendChild(require_script);
+}
+else {
+    loadDotnetInteractiveApi();
+}
+
+    </script>
 </div>
 
 
@@ -246,7 +140,7 @@ else {
 
 ## Why PowerShell Jupyter notebooks for blogging? <a name="why"></a>
 
-PowerShell as a language is designed as an interactive language since it can be used from the Console and also as a scripting language. Therefore it's just natural to share code examples and their output as part of blogging about PowerShell. With Jupyter Notebooks the output, the code and the text, images, equations are all part of one document. A blog post can be written as a Notebook with the ability to interactively modify run and re-run the code as you. Once the Notebook has been finished the document (.ipynb) can be converted to either HTML (for WordPress.com) or Markdown format (the conversion and steps for Markdown are easier but I'm still stuck with my old WordPress.com blog for now even though I already have one on GitHub pages too) . In addition to the static document one can also share a Notebook hosted on Github through a specific link (all of the steps required will be described in detail) to be run interactively in the browser through [Binder](https://mybinder.org/).
+PowerShell as a language is designed as an interactive language since it can be used from the Console and also as a scripting language. Therefore it's just natural to share code examples and their output as part of blogging about PowerShell. With Jupyter Notebooks the output, the code and the text, images (images that are pasted to the Notebook are automatically embedded), equations are all part of one document. A blog post can be written as a Notebook with the ability to interactively modify run and re-run the code. Once the Notebook has been finished the document (.ipynb) can be converted to either HTML (for WordPress.com) or Markdown format (the conversion and steps for Markdown are easier but I'm still somehow sticking with my old WordPress.com blog for now even though I already have one on GitHub pages too) . In addition to the static document one can also share a Notebook hosted on Github through a specific link (all of the steps required will be described in detail) to be run interactively in the browser through [Binder](https://mybinder.org/).
 
 ## How? <a name="how"></a>
 
@@ -260,11 +154,11 @@ It's actually quite easy once you have setup your environment with all pre-requi
 
 - Jupyter notebook converters
 
-  - Markdown: based on this [article](https://www.fast.ai/2020/01/20/nb2md/) from fast.ai I can recommend the usage of their nbdev tool 
+  - Markdown conversion: based on this [article](https://www.fast.ai/2020/01/20/nb2md/) from fast.ai I can recommend the usage of their nbdev tool 
 
     `pip install nbdev`
 
-  - Html for WordPress.com (WordPress.com requires the CSS to be inline (inside the HTML elements): I'm using the excellent python script nb2wp [here](https://github.com/bennylp/nb2wp). You require the nb2wp.py script and the style.css CSS style sheet from the repository.
+  - Html for WordPress.com (WordPress.com requires the CSS to be inline (inside the HTML elements) conversion: I'm using the excellent python script nb2wp from [here](https://github.com/bennylp/nb2wp). You require the nb2wp.py script and the style.css CSS style sheet from the repository.
 
     - The script itself has also some dependencies that you will require to install via pip in case you run into errors when executing the script.
 
@@ -351,6 +245,7 @@ which I both saved into the root folder of the repository.
 #### Steps <a name="stepswp"></a>
 
 * Put the .ipynb file into the root of your folder.
+   * Make sure to save the file before you download it to make sure any pasted images will be embedded.
 * Run the build.ps1 script
    * The build function requires to following arguments
       1. NotebookName - The name of the Jupyter Notebook file
@@ -373,16 +268,29 @@ which I both saved into the root folder of the repository.
 
 ### Steps for Markdown conversion<a name="stepsmd"></a>
 
-There is only one setup step which is to create a small Python script to update the image src pathes to point to /images folder of your blog. Put the following Python script into the root folder (I called it upd_md.py)
-```python
-import fileinput,re
-for f in fileinput.input(inplace=True):
-    print(re.sub(r'^(!.*]\()(\w+_files/)', r'\1/images/\2', f), end='')
+There is only one setup step which is to create a PowerShell function to update the image src pathes to point to /images folder of your blog. Put the following PowerShell function into the root folder (I called it build.ps1)
+```
+function build ($MarkdownFilePath){
+    $text = Get-Content $MarkdownFilePath  -Raw
+    $imgPath = Join-Path (Split-Path $MarkdownFilePath) ([System.IO.Path]::GetFileNameWithoutExtension($MarkdownFilePath))
+    $images = dir ($imgPath + '_files\att_[0-9]*.png')
+    foreach ($image in $images){
+        $toReplace = [regex]::Match($text,'!\[image\.png]\(attachment:[0-9a-f]{8}-.*\.png\)').Value
+        $newPath = (Split-path (Split-path $image.FullName) -leaf) + '/' + ($image.Name)
+        $replacement = '![image.png](' + $newPath + ')'
+        $text = $text.Replace($toReplace, $replacement)
+    }
+    $text = $text -replace '^(!.*]\()(\w+_files/)', '$1/images/$2'
+    $text = [regex]::replace($text, '^(!.*\]\()(\w+_files/)','$1/images/$2','Multiline')
+    $text | Set-Content $MarkdownFilePath -NoNewline
+}
 ```
 
 * Put the .ipynb into the root of the folder
 * Convert the .ipynb to Markdown using fast.ai's nbdev python based tool `nbdev_nb2md NAMEOFTHENOTEBOOKFILE.ipynb`
-* Run the previously created upd_md.py script `python upd_md.py NAMEOFTHENOTEBOOKFILE.md'
-* Copy the generated .md file into your 'posts' folder prefixing it with the required YYYY-MMMM-DD- prefix
-* Copy the extracted images from the "images\NAMEOFTHENOTEBOOKFILE" subfolder to your blog's images folder
+* Run the previously created build function `build NAMEOFTHENOTEBOOKFILE.md 
+* Copy the generated .md file into your '_posts' folder prefixing it with the required YYYY-MMMM-DD- prefix
+* Copy the extracted images folder "NAMEOFTHENOTEBOOKFILE_files" subfolder to your blog's images folder (no prefix here)
 * Push the changes to your blog's repo
+
+Happy blogging.
