@@ -1,4 +1,27 @@
+---
+title: "Jupyter PowerShell Notebooks based blogging"
+excerpt: "In this post I would like to share how one can use PowerShell Jupyter Notebooks with .Net interactive for blogging"
+tags: 
+  - code
+  - powershell
+---
+# Jupyter PowerShell Notebooks based blogging
+
 # Table of contents
+- ## [What are Jupyter notebooks?](#what)
+
+- ## [Why PowerShell Jupyter notebooks for blogging?](#why)
+
+- ## [How](#how)
+  - ### [Prerequisites](#pre)
+
+  - ### [Setup and steps for WordPress.com HTML conversion](#setupandstepswp)
+
+    - #### [Setup](#setupwp)
+
+    - #### [Steps](#stepswp)
+
+  - ### [Steps for Markdown conversion](stepsmd)
 
 
 
@@ -19,113 +42,7 @@ Invoke-RestMethod $url -DisableKeepAlive
 ```
 
 
-
-<div>
-    <div id='dotnet-interactive-this-cell-172.Microsoft.DotNet.Interactive.Http.HttpPort' style='display: none'>
-        The below script needs to be able to find the current output cell; this is an easy method to get it.
-    </div>
-    <script type='text/javascript'>
-async function probeAddresses(probingAddresses) {
-    function timeout(ms, promise) {
-        return new Promise(function (resolve, reject) {
-            setTimeout(function () {
-                reject(new Error('timeout'))
-            }, ms)
-            promise.then(resolve, reject)
-        })
-    }
-
-    if (Array.isArray(probingAddresses)) {
-        for (let i = 0; i < probingAddresses.length; i++) {
-
-            let rootUrl = probingAddresses[i];
-
-            if (!rootUrl.endsWith('/')) {
-                rootUrl = `${rootUrl}/`;
-            }
-
-            try {
-                let response = await timeout(1000, fetch(`${rootUrl}discovery`, {
-                    method: 'POST',
-                    cache: 'no-cache',
-                    mode: 'cors',
-                    timeout: 1000,
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: probingAddresses[i]
-                }));
-
-                if (response.status == 200) {
-                    return rootUrl;
-                }
-            }
-            catch (e) { }
-        }
-    }
-}
-
-function loadDotnetInteractiveApi() {
-    probeAddresses(["http://10.2.1.196:1025/", "http://127.0.0.1:1025/"])
-        .then((root) => {
-        // use probing to find host url and api resources
-        // load interactive helpers and language services
-        let dotnetInteractiveRequire = require.config({
-        context: '172.Microsoft.DotNet.Interactive.Http.HttpPort',
-                paths:
-            {
-                'dotnet-interactive': `${root}resources`
-                }
-        }) || require;
-
-            window.dotnetInteractiveRequire = dotnetInteractiveRequire;
-
-            window.configureRequireFromExtension = function(extensionName, extensionCacheBuster) {
-                let paths = {};
-                paths[extensionName] = `${root}extensions/${extensionName}/resources/`;
-                
-                let internalRequire = require.config({
-                    context: extensionCacheBuster,
-                    paths: paths,
-                    urlArgs: `cacheBuster=${extensionCacheBuster}`
-                    }) || require;
-
-                return internalRequire
-            };
-        
-            dotnetInteractiveRequire([
-                    'dotnet-interactive/dotnet-interactive'
-                ],
-                function (dotnet) {
-                    dotnet.init(window);
-                },
-                function (error) {
-                    console.log(error);
-                }
-            );
-        })
-        .catch(error => {console.log(error);});
-    }
-
-// ensure `require` is available globally
-if ((typeof(require) !==  typeof(Function)) || (typeof(require.config) !== typeof(Function))) {
-    let require_script = document.createElement('script');
-    require_script.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js');
-    require_script.setAttribute('type', 'text/javascript');
-    
-    
-    require_script.onload = function() {
-        loadDotnetInteractiveApi();
-    };
-
-    document.getElementsByTagName('head')[0].appendChild(require_script);
-}
-else {
-    loadDotnetInteractiveApi();
-}
-
-    </script>
-</div>
+
 
 
       _    _      _ _        __          __        _     _ _ 
@@ -134,9 +51,10 @@ else {
      |  __  |/ _ \ | |/ _ \    \ \/  \/ / _ \| '__| |/ _` | |
      | |  | |  __/ | | (_) |    \  /\  / (_) | |  | | (_| |_|
      |_|  |_|\___|_|_|\___/      \/  \/ \___/|_|  |_|\__,_(_)
-                                                             
-                                                             
-    
+
+
+​                                                             
+​    
 
 ## Why PowerShell Jupyter notebooks for blogging? <a name="why"></a>
 
@@ -200,7 +118,7 @@ nb2wp(fullname, out_dir=outdir,  remove_attrs=False,img_url_prefix=urlPrefix)
 
 ... and the PowerShell script (build.ps1) ...
 
-```
+```powershell
 function build {
         [CmdletBinding()]
         param (
@@ -216,9 +134,11 @@ function build {
     Push-Location $path
     $NotebookName = $NotebookName.Replace('.\','')
     $nbPath = (Resolve-Path $NotebookName)
+	copy $nbPath notebooks
     $text = Get-Content $nbPath -Raw
     $text = $text.Replace('$','~~')
-    $text | Set-Content $nbPath -NoNewline -Encoding utf8
+    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+    [System.IO.File]::WriteAllLines($nbPath, $text, $Utf8NoBomEncoding)
     python .\run_nb2wp.py $NotebookName $imageUrlPrefix
     $text = $text.Replace('~~' ,'$')
     $text | Set-Content $nbPath -NoNewline  -Encoding utf8
@@ -235,7 +155,7 @@ function build {
     $result.foreach{$_.remove()}
     $doc.DocumentNode.SelectSingleNode('//body').OuterHtml | Set-Clipboard
     $doc.Save($htmlPath)
-    move (Resolve-Path $NotebookName) notebooks
+    del $nbPath
     Pop-Location
 }
 ```
