@@ -1,3 +1,10 @@
+---
+title: "Using PowerShell and to learn a bit about graph theory"
+excerpt: "In this post I'm going to explore a bit of graph theory based on chapter 2 of the execellent book "[Think Complexity 2e](https://greenteapress.com/wp/think-complexity-2e/)" by Allen B. Downey."
+tags: 
+  - code
+  - powershell
+---
 # Graph theory with PowerShell
 
 
