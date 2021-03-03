@@ -11,8 +11,8 @@ tags:
 
 ![image.png](attachment:6f426e8b-b7da-47d2-b807-df99b330c919.png)
 
-Many times we download files they come in .zip format. The manual process to unblock and extract those files is quite cumbersome. Therefore I would like to walk you through the creation of a PowerShell function that will monitor a download folder for incoming .zip files and then automatically (smartly more than below) extract the files.
-The function should meet the following requirements:
+Many of the files we download are .zip compressed archives. The manual  process to unblock and extract those files is quite cumbersome.  Therefore I would like to walk you through the creation of a PowerShell  function that will monitor a download folder for incoming .zip files and then automatically (smart) extract the files. The function should meet the following requirements:
+
 - Run in the background and not block input on the PowerShell prompt.
 - Use limitited resources for the constant monitoring of the folder.
 - Ability to specify the download folder to be monitored.
@@ -20,7 +20,7 @@ The function should meet the following requirements:
 - Unblock the .zip file prior to the extraction.
 - Smart extraction: If the .zip files are already contained in a folder within the .zip just extract the file as is otherwise extract the .zip to a dedicated folder.
 
-Luckily, there is already a .Net object that can take care of the monitoring part in the background (asynchronous). The [FileSystemWatcher](https://docs.microsoft.com/en-us/dotnet/api/system.io.filesystemwatcher?view=net-5.0) class and even more fortuante is, that I have already created a PowerShell wrapper to monitor a folder (below without comment based help to save some space the full version can be downloaded as part of my [PowerShellScripts](https://github.com/DBremen/PowerShellScripts) module:
+Luckily, there is already a .Net object that can take care of the monitoring part in the background (asynchronous). The [FileSystemWatcher](https://docs.microsoft.com/en-us/dotnet/api/system.io.filesystemwatcher?view=net-5.0) class and even more fortuante is, that I have already created a  PowerShell wrapper to monitor a folder (below without comment based help to save some space the full version can be downloaded as part of my [PowerShellScripts](https://github.com/DBremen/PowerShellScripts) module:
 
 ```PowerShell
 function Monitor-Folder {
@@ -101,7 +101,7 @@ function Monitor-Folder {
 }
 ```
 
-The function is just a convenience wrapper. We can easily monitor a folder like this:
+The function makes it easy to monitor a folder:
 
 ```PowerShell
 $monitor = Monitor-Folder "$env:USERNAME\Desktop" -EventName All -DefaultOutput
@@ -111,7 +111,7 @@ The default output of the function looks similar to this:
 
 ![image.png](attachment:f44723ea-ea09-461c-b978-b74ca310ac30.png)
 
-The highlight of Monitor-Folder is the ability to refer to the event variables directly from within the provided $Action ScriptBlock (this ScriptBlock is executed when the monitored event is triggered):
+The highlight of Monitor-Folder is the ability to refer to the event  variables directly from within the provided $Action script block (it is  executed when the monitored event is triggered):
 
 ```PowerShell
 $folder = "$env:USERPROFILE\Desktop\test\Desktop\test"
@@ -119,7 +119,7 @@ $action = {Write-host "$fullName was deleted at $time";[console]::beep(500,500)}
 $monitor = Monitor-Folder $folder -EventName Deleted -Action $action
 ```
 
-Those are the variables that are available within the Action ScriptBlock argument for Monitor-Folder:
+Those are the variables that are available within the Action script block argument:
 
 | Variable Name | Events | Description |
 |-|-|-|
@@ -141,7 +141,7 @@ $monitor.Events| Remove-Job
 $monitor.Watcher.Dispose()
 ```
 
-With several of the requirements already checked, we can now focus on the remaining one's. All of the operations we want to execute on the .zip file will happen within the $Action ScriptBlock provided to the Monitor-Folder function. While testing downloads in Chrome and FireFox I noticed that for Chrome the Renamed event is triggered for downloaded files while for FireFox it is the Created event. Therefore we must Monitor for both.
+With several of the requirements already checked, we can now focus on  the others. All of the operations we want to execute on the .zip file  will happen within the $Action script block argument that is passed to  the function. During the testing of the downloads in Chrome and FireFox I noticed that for Chrome the Renamed event is triggered for downloaded  files while for FireFox it is the Created event. Therefore we need to  monitor both.
 
 ```PowerShell
 $keep = $false
@@ -176,15 +176,15 @@ $monitor = Monitor-Folder $downloadFolder -EventName Created, Renamed  -Filter *
 
 ```
 
-For the "smart" extraction we use the [IO.Compression.ZipFile]::OpenRead to peek into the .zip file in order to find out whether the .zip files are already contained in a folder with the same name as the .zip file. If the .zip files are not already contained within a folder we will create one while taking care of the scenario if there is already a folder with the same name as the .zip file. Other than that we specify a filter to only monitor .zip files within the specified folder and change the NotifyFilter to be based on FileName and Size of the file. This is in order to avoid most of the duplicate events being triggered by the download of the file. During my tests Firefox still raised two Created events for every download. In that case the OpenRead method on the .zip file will fail for the first event since the file hasn't been finished downloading. The rather unelegant workaround for this is to put the whole action block into a try catch construct.
+For the “smart” extraction we use the [IO.Compression.ZipFile]::OpenRead to peek into the .zip file in order to find out whether the .zip files  are already contained in a folder with the same name as the .zip file.  Otherwise, we will create a folder while taking care of the scenario if  there is already a folder with the same name as the .zip file. Other  than that, we specify a filter to only monitor .zip files and change the NotifyFilter to be based on the name and and the size of the file. This is in order to avoid most of the duplicate events being triggered by  the download of the file. During my tests Firefox still raised two  Created events for every download. For the first Created event the  OpenRead method on the .zip file will fail, since the file hasn’t been  finished downloading yet. The rather not so elegant workaround for this  is to put the whole action block into a try catch construct.
 
-The only requirement that is not met is putting the whole script into a background thread. Rather than re-inventing the wheel, I'd like to make use of the excellent ThreadJob module that already comes with PowerShell 7. For any other version the module can be installed via:
+The only requirement that is not met so far, is putting the whole script into a background thread. Rather than re-inventing the wheel, I’d like  to make use of the excellent ThreadJob module that is built-in to  PowerShell 7. For any other PowerShell version the module can be  installed via:
 
 ```PowerShell
 Install-Module ThreadJob
 ```
 
-Now we will need to add an infinitive loop in order to keep the thread running in the background. In addition we can use \\$using:VARIABLENAME in order to feed the arguments into the ScriptBlock that runs in another thread. Here is the whole funciton (again the full version including comment based help can be downloaded from my [GitHub repo]((https://github.com/DBremen/PowerShellScripts)).
+We will need to add an infinitive loop to the script block in order to  keep the thread running in the background. In addition we can use  $using:VARIABLENAME to ensure variables outside the script block are  visible inside its scope. Here is the whole function (again the full  version including comment based help can be downloaded from my [GitHub repo](https://github.com/DBremen/PowerShellScripts)).
 
 ```PowerShell
 function Expand-ArchiveAutomamtically {

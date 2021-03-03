@@ -32,4 +32,4 @@ tags:
     del $NotebookName
 }
 
-build AutoExtract.ipynb "Use PowerShell to monitor a folder and extract downloaded .zip files" "Use PowerShell to monitor a download folder as a background task and smartly extract .zip files automatically as you download them."
+build compareObject.ipynb "Extending PowerShell's Compare-Object to handle custom classes and arrays" "In this post I will walk you through the process of extending the the built-in Compare-Object cmdlet to support 'deep' comparison of custom objects, arrays, and classes."
