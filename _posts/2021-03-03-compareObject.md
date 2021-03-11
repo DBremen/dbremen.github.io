@@ -31,113 +31,7 @@ class Person {
 ```
 
 
-
-<div>
-    <div id='dotnet-interactive-this-cell-2062.Microsoft.DotNet.Interactive.Http.HttpPort' style='display: none'>
-        The below script needs to be able to find the current output cell; this is an easy method to get it.
-    </div>
-    <script type='text/javascript'>
-async function probeAddresses(probingAddresses) {
-    function timeout(ms, promise) {
-        return new Promise(function (resolve, reject) {
-            setTimeout(function () {
-                reject(new Error('timeout'))
-            }, ms)
-            promise.then(resolve, reject)
-        })
-    }
-
-    if (Array.isArray(probingAddresses)) {
-        for (let i = 0; i < probingAddresses.length; i++) {
-
-            let rootUrl = probingAddresses[i];
-
-            if (!rootUrl.endsWith('/')) {
-                rootUrl = `${rootUrl}/`;
-            }
-
-            try {
-                let response = await timeout(1000, fetch(`${rootUrl}discovery`, {
-                    method: 'POST',
-                    cache: 'no-cache',
-                    mode: 'cors',
-                    timeout: 1000,
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: probingAddresses[i]
-                }));
-
-                if (response.status == 200) {
-                    return rootUrl;
-                }
-            }
-            catch (e) { }
-        }
-    }
-}
-
-function loadDotnetInteractiveApi() {
-    probeAddresses(["http://10.0.13.207:1024/", "http://127.0.0.1:1024/"])
-        .then((root) => {
-        // use probing to find host url and api resources
-        // load interactive helpers and language services
-        let dotnetInteractiveRequire = require.config({
-        context: '2062.Microsoft.DotNet.Interactive.Http.HttpPort',
-                paths:
-            {
-                'dotnet-interactive': `${root}resources`
-                }
-        }) || require;
-
-            window.dotnetInteractiveRequire = dotnetInteractiveRequire;
-
-            window.configureRequireFromExtension = function(extensionName, extensionCacheBuster) {
-                let paths = {};
-                paths[extensionName] = `${root}extensions/${extensionName}/resources/`;
-                
-                let internalRequire = require.config({
-                    context: extensionCacheBuster,
-                    paths: paths,
-                    urlArgs: `cacheBuster=${extensionCacheBuster}`
-                    }) || require;
-
-                return internalRequire
-            };
-        
-            dotnetInteractiveRequire([
-                    'dotnet-interactive/dotnet-interactive'
-                ],
-                function (dotnet) {
-                    dotnet.init(window);
-                },
-                function (error) {
-                    console.log(error);
-                }
-            );
-        })
-        .catch(error => {console.log(error);});
-    }
-
-// ensure `require` is available globally
-if ((typeof(require) !==  typeof(Function)) || (typeof(require.config) !== typeof(Function))) {
-    let require_script = document.createElement('script');
-    require_script.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js');
-    require_script.setAttribute('type', 'text/javascript');
-    
-    
-    require_script.onload = function() {
-        loadDotnetInteractiveApi();
-    };
-
-    document.getElementsByTagName('head')[0].appendChild(require_script);
-}
-else {
-    loadDotnetInteractiveApi();
-}
-
-    </script>
-</div>
+​     
 
 
 We create two virtual families based on this blueprint. Notice that the `Parent` property of the `Person` objects are just arrays of type `Person`.
@@ -172,12 +66,13 @@ Dooh, again no output? Let's try another approach.
 Compare-Object $nsmith $adoe -Property Parents -IncludeEqual
 ```
 
-    
+
     Parents      SideIndicator
     -------      -------------
     {Paul, Mary} ==
-    
-    
+
+
+​    
 
 What is going on here, is that Compare-Object just compares the string representation of the Parents properties
 
@@ -188,7 +83,7 @@ $adoe.Parents.ToString()
 
     Person[]
     Person[]
-    
+
 
 How can we get Compare-Object to actually compare the nested properties of the Parents objects?
 
@@ -196,13 +91,14 @@ How can we get Compare-Object to actually compare the nested properties of the P
 Compare-Object $nsmith $adoe -Property {$_.Parents.Name}
 ```
 
-    
+
     $_.Parents.Name SideIndicator
     --------------- -------------
     {Jon, Mary}     =>
     {Paul, Mary}    <=
-    
-    
+
+
+​    
 
 How about multiple properties?
 
@@ -210,34 +106,36 @@ How about multiple properties?
 Compare-Object $nsmith $adoe -Property { $_.Parents.Age }, { $_.Parents.Name }
 ```
 
-    
+
      $_.Parents.Age   $_.Parents.Name  SideIndicator
     ---------------- ----------------- -------------
     {46, 51}         {Jon, Mary}       =>
     {46, 35}         {Paul, Mary}      <=
-    
-    
 
-While this is producing output, it's not really useful nor what one would expect from a Compare-Object cmdlet.Generally, the output of the cmdlet is confusing. Instead of showing the reference- and difference values side-by-side the output is shown in one line per input object instead. One more try ..
+
+​    
+
+While this is producing output, it's not really useful nor what one would expect from a Compare-Object cmdlet. Generally, the output of the cmdlet is confusing. Instead of showing the reference- and difference values side-by-side the output is shown in one line per input object instead. One more try ..
 
 ```PowerShell
 Compare-Object $nsmith $adoe -Property { $_.Parents[1].Age }, { $_.Parents[1].Name }
 ```
 
-    
+
      $_.Parents[1].Age   $_.Parents[1].Name  SideIndicator
     ------------------- -------------------- -------------
                      51 Mary                 =>
                      35 Mary                 <=
-    
-    
+
+
+​    
 
 If we specify the nested properties, one by one, through ScriptBlock arguments, we get the expected output. It's time to consider the requirements for an extended version of the cmdlet, that is better able to deal with custom classes and object arrays. Here is what I came up with:
 
 - Iterate over arrays of custom objects and custom classes.
 - Iterate over custom objects and custom classes and their properties.
 - Show output in 'Property' 'ReferenceValue' 'DifferenceValue' format rather than the default output.
-- Ability to specifiy a maximum recursion Depth (how deep we want Compare-Object to iterate over nested objects and properties)
+- Ability to specify a maximum recursion Depth (how deep we want Compare-Object to iterate over nested objects and properties)
 - Extend the built-in Compare-Object rather than creating a separate function.
 
 Before we start building this into the Compare-Object cmdlet (via [proxy function](https://devblogs.microsoft.com/scripting/proxy-functions-spice-up-your-powershell-core-cmdlets/)) we can create a small proof of concept function. The function definitely needs to be able to recognize the input object's "type". While this is easy enough for custom objects and arrays, it turned out to be difficult for custom classes.
@@ -252,7 +150,7 @@ $customObjArray -is [Array]
 $adoe.GetType()
 ```
 
-    
+
     IsPublic IsSerial Name                                     BaseType
     -------- -------- ----                                     --------
     True     False    PSCustomObject                           System.Object
@@ -260,8 +158,9 @@ $adoe.GetType()
     True
     ---------
     True     False    Person                                   System.Object
-    
-    
+
+
+​    
 
 We can definitely not check for the name of the type for custom classes. Let's see what else is different about such a class as compared to a built-in type or a PSCustomObject Wait, what would we need to figure this out? Yes, a better Compare-Object would come in handy now.
 
@@ -305,7 +204,7 @@ $props = ($builtinType | gm -MemberType Property).Name.where{$_ -notin $excludeP
 Compare-Stuff $builtinType $personType $props
 ```
 
-    
+
     Property             ReferenceValue                 DifferenceValue
     --------             --------------                 ---------------
     DeclaredNestedTypes  System.String+ProbabilisticMap 
@@ -316,15 +215,16 @@ Compare-Stuff $builtinType $personType $props
     Name                 String                         Person
     Namespace            System                         null
     UnderlyingSystemType System.String                  Person
-    
-    
+
+
+​    
 
 ```PowerShell
 $customType = ([pscustomobject][ordered]@{prop='value'}).GetType()
 Compare-Stuff $customType $personType $props
 ```
 
-    
+
     Property             ReferenceValue                              DifferenceValue
     --------             --------------                              ---------------
     FullName             System.Management.Automation.PSCustomObject Person
@@ -335,12 +235,13 @@ Compare-Stuff $customType $personType $props
     Namespace            System.Management.Automation                null
     TypeInitializer      Void .cctor()                               null
     UnderlyingSystemType System.Management.Automation.PSCustomObject Person
-    
-    
+
+
+​    
 
 I settled for the Namespace property to distinguish custom classes. 
 
-Next, we can update the proto-type with most of the other requirements. In order to iterate over arbitrarily nested objects we will use recursion and let the built-in Compare-Object deal with the comparison once we have dissected the objects into scalars or arrays of scalars. The additional paramenters that start with `__` are there to retain and update values throughout the recursive function calls. I have also added some comments to the code to explain the logic.
+Next, we can update the proto-type with most of the other requirements. In order to iterate over arbitrarily nested objects we will use recursion and let the built-in Compare-Object deal with the comparison once we have dissected the objects into scalars or arrays of scalars. The additional parameters that start with `__` are there to retain and update values throughout the recursive function calls. I have also added some comments to the code to explain the logic.
 
 ```PowerShell
 function Compare-Stuff($ReferenceObject, $DifferenceObject, $MaxDepth = -1, $__Property, $__Depth = 0, [switch]$IncludeEqual, [switch]$ExcludeDifferent, [switch]$PassThru, [switch]$Compact) {
@@ -411,7 +312,7 @@ Giving the new version a first spin:
 Compare-Stuff $nsmith $adoe -Compact -IncludeEqual
 ```
 
-    
+
     Property            ReferenceValue DifferenceValue
     --------            -------------- ---------------
     Name                Nigel          Aidan
@@ -425,8 +326,9 @@ Compare-Stuff $nsmith $adoe -Compact -IncludeEqual
     Parents[1].LastName Smith          Doe
     Parents[1].Age      35             51
     Parents[1].Parents                 
-    
-    
+
+
+​    
 
 This looks already nice. How does it deal with properties that are arrays of sclaras (e.g. [string[]], [int[]]) ?
 
@@ -437,14 +339,15 @@ $lisa  = [PSCustomObject][ordered]@{Name='Lisa'; Colors=('red','black','green','
 Compare-Stuff $peter $lisa -IncludeEqual -Compact
 ```
 
-    
+
     Property         ReferenceValue DifferenceValue
     --------         -------------- ---------------
     Name             Peter          Lisa
     Colors                          {green, pink}
     {Colors, Colors} {red, black}   {red, black}
-    
-    
+
+
+​    
 
 That's what I considered to be correct.
 
@@ -647,7 +550,7 @@ function Compare-Object{
 Compare-Object $nsmith $adoe -Compact -IncludeEqual
 ```
 
-    
+
     Property            ReferenceValue DifferenceValue
     --------            -------------- ---------------
     Name                Nigel          Aidan
@@ -661,14 +564,15 @@ Compare-Object $nsmith $adoe -Compact -IncludeEqual
     Parents[1].LastName Smith          Doe
     Parents[1].Age      35             51
     Parents[1].Parents                 
-    
-    
+
+
+​    
 
 ```PowerShell
 Compare-Object $nsmith $adoe -IncludeEqual
 ```
 
-    
+
     Property            Value SideIndicator
     --------            ----- -------------
     Name                Aidan =>
@@ -689,7 +593,8 @@ Compare-Object $nsmith $adoe -IncludeEqual
     Parents[1].Age      51    =>
     Parents[1].Age      35    <=
     Parents[1].Parents        ==
-    
-    
 
-This is definitely not flawless and more functionality could be added (e.g. handing HashTables), but good enough for my use case. As usual, the full version of the function including comment-based help can be dowloaded from my [GitHub repo](https://github.com/DBremen/PowerShellScripts/blob/master/Extend%20Builtin/Compare-Object.ps1)
+
+​    
+
+This is definitely not flawless and more functionality could be added (e.g. handing HashTables), but good enough for my use case. As usual, the full version of the function including comment-based help can be downloaded from my [GitHub repo](https://github.com/DBremen/PowerShellScripts/blob/master/Extend%20Builtin/Compare-Object.ps1)

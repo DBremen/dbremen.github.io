@@ -26,127 +26,20 @@ $pattern = '(?<=\<).+?(?=\>)'
 ```
 
 
-
-<div>
-    <div id='dotnet-interactive-this-cell-72.Microsoft.DotNet.Interactive.Http.HttpPort' style='display: none'>
-        The below script needs to be able to find the current output cell; this is an easy method to get it.
-    </div>
-    <script type='text/javascript'>
-async function probeAddresses(probingAddresses) {
-    function timeout(ms, promise) {
-        return new Promise(function (resolve, reject) {
-            setTimeout(function () {
-                reject(new Error('timeout'))
-            }, ms)
-            promise.then(resolve, reject)
-        })
-    }
-
-    if (Array.isArray(probingAddresses)) {
-        for (let i = 0; i < probingAddresses.length; i++) {
-
-            let rootUrl = probingAddresses[i];
-
-            if (!rootUrl.endsWith('/')) {
-                rootUrl = `${rootUrl}/`;
-            }
-
-            try {
-                let response = await timeout(1000, fetch(`${rootUrl}discovery`, {
-                    method: 'POST',
-                    cache: 'no-cache',
-                    mode: 'cors',
-                    timeout: 1000,
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: probingAddresses[i]
-                }));
-
-                if (response.status == 200) {
-                    return rootUrl;
-                }
-            }
-            catch (e) { }
-        }
-    }
-}
-
-function loadDotnetInteractiveApi() {
-    probeAddresses(["http://10.2.1.30:1024/", "http://127.0.0.1:1024/"])
-        .then((root) => {
-        // use probing to find host url and api resources
-        // load interactive helpers and language services
-        let dotnetInteractiveRequire = require.config({
-        context: '72.Microsoft.DotNet.Interactive.Http.HttpPort',
-                paths:
-            {
-                'dotnet-interactive': `${root}resources`
-                }
-        }) || require;
-
-            window.dotnetInteractiveRequire = dotnetInteractiveRequire;
-
-            window.configureRequireFromExtension = function(extensionName, extensionCacheBuster) {
-                let paths = {};
-                paths[extensionName] = `${root}extensions/${extensionName}/resources/`;
-                
-                let internalRequire = require.config({
-                    context: extensionCacheBuster,
-                    paths: paths,
-                    urlArgs: `cacheBuster=${extensionCacheBuster}`
-                    }) || require;
-
-                return internalRequire
-            };
-        
-            dotnetInteractiveRequire([
-                    'dotnet-interactive/dotnet-interactive'
-                ],
-                function (dotnet) {
-                    dotnet.init(window);
-                },
-                function (error) {
-                    console.log(error);
-                }
-            );
-        })
-        .catch(error => {console.log(error);});
-    }
-
-// ensure `require` is available globally
-if ((typeof(require) !==  typeof(Function)) || (typeof(require.config) !== typeof(Function))) {
-    let require_script = document.createElement('script');
-    require_script.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js');
-    require_script.setAttribute('type', 'text/javascript');
-    
-    
-    require_script.onload = function() {
-        loadDotnetInteractiveApi();
-    };
-
-    document.getElementsByTagName('head')[0].appendChild(require_script);
-}
-else {
-    loadDotnetInteractiveApi();
-}
-
-    </script>
-</div>
 
 
     peter@gmail.com
     paul@gmail.com
     zoe@gmx.com
-    
+
 
 The RegEx can be interpreted like this:
 
 | RegEx | Description |
 | --- | --- |
-| (?<=\<) | Positive lookbehind. Matches only if the text is preceded by the specificied character ('<' is escaped with '\' to ensure it's taken literally). But does not inlude the character within the match. |
-| .+? | Capure one or more (+) of any character ('.'), but only as few characters as possible ('?'). |
-| (?=\>) | Positive lookahead. Matches only if the text is followed by the specificied character ('<' is escaped with '\' to ensure it's taken literally). But does not inlude the character within the match. |
+| (?<=\<) | Positive lookbehind. Matches only if the text is preceded by the specified character ('<' is escaped with '\' to ensure it's taken literally). But does not include the character within the match. |
+| .+? | Capture one or more (+) of any character ('.'), but only as few characters as possible ('?'). |
+| (?=\>) | Positive lookahead. Matches only if the text is followed by the specified character ('<' is escaped with '\' to ensure it's taken literally). But does not include the character within the match. |
 
 In order to make this into more useful I've converted this into a function with the following additional features:
 * Specify the enclosing character(s)
@@ -167,7 +60,7 @@ Get-TextWithin $s -StartChar / -EndChar \
 
     some data
     even more data
-    
+
 
 ```PowerShell
 $s=@'
@@ -180,7 +73,7 @@ Get-TextWithin $s "'"
 
     some data
     even more data
-    
+
 
 The [Get-TextWitihin](https://github.com/DBremen/PowerShellScripts/blob/master/Data%20Wrangling/Get-TextWithin.ps1) function can also be downloaded via GitHub and is also part of my [PowerShell Scripts](https://github.com/DBremen/PowerShellScripts) collection module.
 

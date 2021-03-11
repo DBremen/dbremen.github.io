@@ -17,9 +17,9 @@ tags:
    * ### [Random graphs](#random)
    * ### [Probability of connectivity](#connectivity)
 
-When I try to learn a new technical topic it is easier for me to do/experience the new topic through a technology I already know about. That's why I perfer to play around with things in PowerShell even though there might be better ways of doing the same using another technology. 
+When I try to learn a new technical topic it is easier for me to do/experience the new topic through a technology I already know about. That's why I prefer to play around with things in PowerShell even though there might be better ways of doing the same using another technology. 
 
-In this post I'm going to explore a bit of graph theory based on chapter 2 of the execellent book "[Think Complexity 2e](https://greenteapress.com/wp/think-complexity-2e/)" by Allen B. Downey (in fact I'd highly recommend any of the books in the "Think..." series some of which I might cover in future posts). The book and the book's source (in Python) are available for free through the book's webpage.
+In this post I'm going to explore a bit of graph theory based on chapter 2 of the excellent book "[Think Complexity 2e](https://greenteapress.com/wp/think-complexity-2e/)" by Allen B. Downey (in fact I'd highly recommend any of the books in the "Think..." series some of which I might cover in future posts). The book and the book's source (in Python) are available for free through the book's webpage.
 [Graph theory](https://en.wikipedia.org/wiki/Graph_theory) is the study of graphs, which are mathematical structures used to model pairwise relations between objects. A graph is made up of vertices (also called nodes or points) which are connected by edges (also called links or lines). Since networks are everywhere, graph theory is everywhere, too.  Graph theory is used to model and study all kinds of things that affect our daily lives: from traffic routes to social networks or integrated circuits.
 
 We will use the excellent [PSGraph](https://github.com/KevinMarquette/PSGraph) module developed by Keven Marquette for visualizing the graphs. PSGraph is a wrapper around [Graphviz](https://graphviz.org/) which is a commandline utility for displaying graphs. We will need to install both PSGraph and Graphviz.
@@ -106,7 +106,7 @@ Get-GraphVisual Friends -Edges $edges | Show-PSGraph
 ## Undirected graphs <a name="undirected"></a>
 
 As an example of an undirected graph the below graph shows the connection between four cities in the United States. The labels on the edges indicate driving time in hours. In this example the placement of the nodes corresponds roughly to the geography of the cities, but in general the layout of a graph is arbitrary.
-This time we will create node and edge objects since the position of the nodes is an attribute of a node rather than an edge. Edges  can also have labels assinged through the label attribute. We also need to switch the LayoutEngine since not every one of them honors the position attribute (see [here](https://observablehq.com/@magjac/placing-graphviz-nodes-in-fixed-positions)).
+This time we will create node and edge objects since the position of the nodes is an attribute of a node rather than an edge. Edges  can also have labels assigned through the label attribute. We also need to switch the LayoutEngine since not every one of them honors the position attribute (see [here](https://observablehq.com/@magjac/placing-graphviz-nodes-in-fixed-positions)).
 
 ```PowerShell
 $nodes = & {
@@ -212,7 +212,7 @@ $randomGraph.Edges.Count
 ```
 
     13
-    
+
 
 ![image.png](/images/Graph_theory_with_PowerShell_files/att_00003.png)
 
@@ -252,7 +252,7 @@ Get-Neighbours $completeGraph.Edges 0
     7
     8
     9
-    
+
 
 ```PowerShell
 Get-Neighbours $randomGraph.Edges 2
@@ -260,7 +260,7 @@ Get-Neighbours $randomGraph.Edges 2
 
     7
     8
-    
+
 
 With the Get-Neighbours function we can also create a function that iterates through a graph's nodes connected by edges and return the nodes that can be reached from a given start node. This is implemented through Get-ReachableNodes, where we use a Stack to collect the neighbours and a HashSet to keep track of "visited" nodes.
 
@@ -300,14 +300,14 @@ Get-IsConnected $completeGraph -Undirected
 ```
 
     True
-    
+
 
 ```PowerShell
 Get-IsConnected $randomGraph -Undirected
 ```
 
     False
-    
+
 
 ### Probability of connectivity <a name="connectivity"></a>
 
@@ -330,7 +330,7 @@ Get-ProbabilityConnected $nodeCount .23 100
 ```
 
     0.29
-    
+
 
 23% was chosen because it is close to the critical value where the probability of connectivity goes from near 0 to near 1. According to Erdös and Renyi.
 
@@ -339,7 +339,7 @@ Get-ProbabilityConnected $nodeCount .23 100
 ```
 
     0.230258509299405
-    
+
 
 We can get try to replicate transition by estimating the probability of connectivity for a range of values of probabilities. We implement Python's [numpy.Logspace](https://numpy.org/doc/stable/reference/generated/numpy.logspace.html) function to get an evenly spread list of probabilities within a range on a log scale:
 
@@ -366,7 +366,7 @@ $probabilities
     0.549540873857625
     0.741310241300917
     1
-    
+
 
 ```PowerShell
 foreach ($probability in $probabilites) {
@@ -377,7 +377,7 @@ foreach ($probability in $probabilites) {
 }
 ```
 
-    
+
     Probability        ProbabilityConnected
     -----------        --------------------
     0.0501187233627272 0
@@ -391,7 +391,8 @@ foreach ($probability in $probabilites) {
     0.549540873857625  1.01
     0.741310241300917  1.01
     1                  1.01
-    
-    
+
+
+​    
 
 There you have it. I hope you enjoyed this exploration of graph theory as much as I did.

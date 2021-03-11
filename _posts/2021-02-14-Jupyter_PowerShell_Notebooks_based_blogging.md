@@ -173,7 +173,7 @@ which I both saved into the root folder of the repository.
       3. UrlPostFix   - The last part of the Url that your WP blog uses for uploading media. This is usually something like YYYY/MM but you need to test this on your blog.
    * The script then takes the following steps
       1. Sanitize the urlPrefix for the Python script to update the external image locations
-      2. Replace '\$' characters by a placehoder sine the conversion has problems dealing with them.
+      2. Replace '\$' characters by a placeholder sine the conversion has problems dealing with them.
       3. Run the Python script, which will:
          * Convert the file to HTML
          * Extract the external images files

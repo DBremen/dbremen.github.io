@@ -1,6 +1,12 @@
 function build ($NotebookName,$Title, $Excerpt){
     $parentFolder = $path = $PSScriptRoot
     Push-Location $parentFolder
+    $nbFilePath = Join-Path $parentFolder $NoteBookName
+    $text = Get-Content $nbFilePath -Raw
+    $char = [char]0x9d
+    $text = $text -replace $char,''
+    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+    [System.IO.File]::WriteAllLines($nbFilePath, $text, $Utf8NoBomEncoding)
     nbdev_nb2md $NotebookName | Out-String
     $mdName = ([IO.Path]::ChangeExtension($NotebookName,'md'))
     $markdownFilePath = Join-Path $parentFolder $mdName
@@ -32,4 +38,4 @@ tags:
     del $NotebookName
 }
 
-build compareObject.ipynb "Extending PowerShell's Compare-Object to handle custom classes and arrays" "In this post I will walk you through the process of extending the the built-in Compare-Object cmdlet to support 'deep' comparison of custom objects, arrays, and classes."
+build graphtheory2.ipynb "Graph theory with PowerShell - part 2" "This is part two of 'Graph theory with PowerShell', focussing on 'Small World Graphs', with PowerShell based on (Chapter 3) of the execellent book Think Complexity 2e by Allen B. Downey."
