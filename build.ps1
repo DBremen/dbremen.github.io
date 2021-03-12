@@ -2,6 +2,17 @@ function build ($NotebookName,$Title, $Excerpt){
     $parentFolder = $path = $PSScriptRoot
     Push-Location $parentFolder
     $nbFilePath = Join-Path $parentFolder $NoteBookName
+    #remove the unnecessary script parts that .net interactive notebooks adds
+    $json = Get-Content $nbFilePath | convertfrom-json
+    $codeCells = $json.cells.where{$_.cell_type -eq 'Code'}
+    $codeCells.foreach{
+	    try{
+		    $_.outputs[0].data.psobject.properties.Remove('text/html')
+	    }catch{}
+    }
+    $json | convertto-json -depth 100 | Set-Content $nbFilePath
+    (Get-Content $nbFilePath -Raw).Replace("`r`n","`n") | Set-Content $nbFilePath -Force
+    #for random unicode chars that nb2md complains about
     $text = Get-Content $nbFilePath -Raw
     $char = [char]0x9d
     $text = $text -replace $char,''
