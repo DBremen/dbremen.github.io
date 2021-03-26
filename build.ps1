@@ -16,6 +16,8 @@ function build ($NotebookName,$Title, $Excerpt){
     $text = Get-Content $nbFilePath -Raw
     $char = [char]0x9d
     $text = $text -replace $char,''
+    $char = [char]0x8f
+    $text = $text -replace $char,''
     $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
     [System.IO.File]::WriteAllLines($nbFilePath, $text, $Utf8NoBomEncoding)
     nbdev_nb2md $NotebookName | Out-String
@@ -49,4 +51,4 @@ tags:
     del $NotebookName
 }
 
-build graphtheory2.ipynb "Graph theory with PowerShell - part 2" "This is part two of 'Graph theory with PowerShell', focussing on 'Small World Graphs', with PowerShell based on (Chapter 3) of the execellent book Think Complexity 2e by Allen B. Downey."
+build consoleFun.ipynb "An alternative progress cmdlet based on cli-spinners" "In this post, I would like to share the steps to build a fun project implementing a console-based progress-spinner that runs in a separate thread while executing arbitrary code in the main thread."

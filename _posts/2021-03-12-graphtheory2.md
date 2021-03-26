@@ -219,7 +219,7 @@ Get-ClusteringCoefficient $ringLattice
 ```
 
     0.5
-    
+
 
 ### Shortest Path Length <a name="shortest"></a>
 
@@ -277,7 +277,7 @@ Get-ShortestPath $ringLattice 0
 
 
 
-    
+
     Source Destination Distance
     ------ ----------- --------
     0      9           1
@@ -290,8 +290,9 @@ Get-ShortestPath $ringLattice 0
     0      2           1
     0      1           1
     0      0           0
-    
-    
+
+
+​    
 
 To get the average shortest path length for a whole graph we need to ... :
 - ... do this for every unique starting point (From) in the graph.
@@ -308,7 +309,7 @@ $distances = foreach ($group in $groupedEdges){
 ```
 
     1.66666666666667
-    
+
 
 ### Small-World experiment (Watts, Strogatz) <a name="wse"></a>
 Great, now we have everything in place to do duplicate the Small-world experiment. Showing that there are Small-Word graphs with a certain range of probability (for re-wiring) with high clustering-coefficients (like regular graphs) and a short average path lengths (like in random graphs).
@@ -361,7 +362,7 @@ for ($i=0;$i -lt $result.Count;$i++){
 }
 ```
 
-While this is unfortunate, the results for 100 nodes with 3 connections are showing a similar results (see first graph below). In addition, can take the results from the original Watts/Strogatz paper (L = average path length standardized, C = clustering coefficients standardized) instead and appreciate that as the probability increases, the average path length decreases quite rapidly because even a small number of randomly rewired edges provide shorter paths between nodes that are far apart. Replacing neighbouring links decreases the clustering coefficient much more slowly.
+While this is unfortunate, the results for 100 nodes with 3 connections (see first graph below) are showing a similar trend as the original study's results from the Watts/Strogatz paper (L = average path length standardized, C = clustering coefficients standardized).As the probability increases, the average path length decreases quite rapidly because even a small number of randomly rewired edges provide shorter paths between nodes that are far apart. Replacing neighbouring links decreases the clustering coefficient much more slowly.
 As a result, there is a wide range of probabilities with high clustering coefficients and low average path lengths.
 
 ![image.png](/images/graphtheory2_files/att_00003.png)
