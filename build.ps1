@@ -20,16 +20,19 @@ function build ($NotebookName,$Title, $Excerpt){
     $text = $text -replace $char,''
     $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
     [System.IO.File]::WriteAllLines($nbFilePath, $text, $Utf8NoBomEncoding)
-    nbdev_nb2md $NotebookName | Out-String
+    #nbdev_nb2md $NotebookName | Out-String
     $mdName = ([IO.Path]::ChangeExtension($NotebookName,'md'))
     $markdownFilePath = Join-Path $parentFolder $mdName
     $text = Get-Content $markdownFilePath  -Raw
     $imgPath = Join-Path (Split-Path $markdownFilePath) ([System.IO.Path]::GetFileNameWithoutExtension($markdownFilePath))
-    $images = dir ($imgPath + '_files\att_[0-9]*.png')
+    $images = dir ($imgPath + '_files\att_[0-9]*')
     foreach ($image in $images){
-        $toReplace = [regex]::Match($text,'!\[image\.png]\(attachment:[0-9a-f]{8}-.*\.png\)').Value
+        $ext = $image.Extension
+        #$regex = '!\[image\' + $ext + ']\(attachment:[0-9a-f]{8}-.*\' + $ext + '\)'
+        $regex = '!\[\w+\' + $ext + ']\(attachment:[0-9a-f]{8}-.*\' + $ext + '\)'
+        $toReplace = [regex]::Match($text,$regex).Value
         $newPath = (Split-path (Split-path $image.FullName) -leaf) + '/' + ($image.Name)
-        $replacement = '![image.png](' + $newPath + ')'
+        $replacement = '![image' + $ext + '](' + $newPath + ')'
         $text = $text.Replace($toReplace, $replacement)
     }
     $text = $text -replace '^(!.*]\()(\w+_files/)', '$1/images/$2'

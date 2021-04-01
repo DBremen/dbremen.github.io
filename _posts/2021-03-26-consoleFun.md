@@ -5,10 +5,6 @@ tags:
   - code
   - powershell
 ---
-# Title
-
-
-
 In this post, I would like to share the steps to build a fun project implementing a console-based progress-spinner that runs in a separate thread while executing arbitrary code in the main thread. The code I'm sharing is compatible with WindowsPowerShell 5.1 and works best when executed within Windows Terminal rather than the PowerShell console window. To keep the cursor in the same position, while writing the progress, we will make use of [ANSI-Escape sequences](https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences). 
 
 Let's start with a very simple example just to show how it works.
@@ -22,7 +18,7 @@ function simpleSpinner {
 }
 ```
 
-![simpleSpinner.gif](attachment:6f9d4e89-3aa1-4737-9bf7-cba6b77ac094.gif)
+![image.gif](/images/consoleFun_files/att_00000.gif)
 
 The variable`$e` in the example above holds the escape sequence that precedes any ANSI-Escape sequence (PowerShell 7 introduced the ``e` `` character sequence for that purpose see [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_special_characters?view=powershell-7.1). The two escape sequences used do the following:
 
@@ -120,7 +116,7 @@ Let's give this version a spin (no pun intended) before we look into the details
 Write-TerminalProgress -IconSet soccerHeader
 ```
 
-![soccerSpinner.gif](attachment:fbf1c2f5-520a-499e-85ec-794168a0c242.gif)
+![image.gif](/images/consoleFun_files/att_00001.gif)
 
 Nice! Let's look at the additions and think about what else we want to add to turn this into a re-usable function.
 - Based on the selected IconSet the following information is retrieved:
@@ -238,7 +234,7 @@ $margin = [console]::WindowWidth/2-$text.Length
 1..5 | testing -Process {"Processing item $_";$_..10;sleep -seconds 2}
 ```
 
-![testing_.gif](attachment:eafdcd10-5fff-4d3f-8f36-49b3eb957e3b.gif)
+![image.gif](/images/consoleFun_files/att_00002.gif)
 
 We now only need to add the remainder of the requirements to finish `Write-TerminalProgress`. Other than the additional logic, I have only made use of one additional escape sequence for positioning the cursor instead of using `[Sytsem.Console]::SetCursorPosition`: `$e[<y>;<x>H`.
 
@@ -366,4 +362,4 @@ $htArgs = @{
 1..5 | Write-TerminalProgress @htArgs
 ```
 
-![final.gif](attachment:79edc2bf-c931-4689-8259-d0b6623c04cf.gif)
+![image.gif](/images/consoleFun_files/att_00003.gif)
